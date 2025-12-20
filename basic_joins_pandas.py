@@ -95,3 +95,29 @@ def find_managers(employee: pd.DataFrame) -> pd.DataFrame:
 # 1, No Merge Overhead: Merges are expensive ($O(N \log N)$ or hash-map based). 
 # .isin() is a highly optimized vectorized lookup.Memory: 
 # You don't create an intermediate dataframe with an extra column for every single employee.
+
+import numpy as np
+import pandas as pd
+
+def confirmation_rate(signups: pd.DataFrame, confirmations: pd.DataFrame) -> pd.DataFrame:
+    confirmations['numerator'] = (confirmations['action'] == 'confirmed').astype(int)
+    df_confirm = (
+        confirmations
+        .groupby(['user_id'])
+        .agg(
+            num_request=('numerator','count'),
+            num_confirm=('numerator','sum'),
+        )
+        # .fillna(0)
+    )
+    df_confirm['confirmation_rate'] = (df_confirm['num_confirm'] / df_confirm['num_request']).round(2)
+    result = (
+        signups
+        .merge(
+            df_confirm,
+            on=['user_id'],
+            how='left',
+        )
+        .fillna(0.)
+    )
+    return result[['user_id','confirmation_rate']].fillna(0.)
