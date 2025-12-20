@@ -75,3 +75,17 @@ WHERE id IN (
     GROUP BY managerId 
     HAVING COUNT(id) >= 5
 );
+
+# Write your MySQL query statement below
+select 
+    s.user_id,
+    round(ifnull(cc.confirmation_rate,0.),2) as confirmation_rate
+from Signups s
+left join (
+    select
+        c.user_id as user_id,
+        avg(case when c.action = 'confirmed' then 1 else 0 end) as confirmation_rate
+    from Confirmations c
+    group by c.user_id
+) as cc 
+on cc.user_id = s.user_id;
