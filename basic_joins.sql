@@ -89,3 +89,14 @@ left join (
     group by c.user_id
 ) as cc 
 on cc.user_id = s.user_id;
+
+# Write your MySQL query statement below
+select 
+    round(sum(d2.is_immediate) / count(d2.is_immediate) * 100,2) as immediate_percentage
+from (
+    select
+        case when d1.order_date = d1.customer_pref_delivery_date then 1 else 0 end as is_immediate,
+        row_number() OVER (PARTITION BY d1.customer_id ORDER BY d1.order_date ASC) as rn
+    from Delivery as d1
+) as d2
+where d2.rn = 1;
