@@ -134,3 +134,16 @@ def monthly_transactions(transactions: pd.DataFrame) -> pd.DataFrame:
         trans_total_amount=('amount', 'sum'),
         approved_total_amount=('approved', 'sum')
     ).reset_index()
+
+import pandas as pd
+
+def immediate_food_delivery(delivery: pd.DataFrame) -> pd.DataFrame:
+    delivery['rank'] = (
+        delivery
+        .groupby(['customer_id'])['order_date']
+        .rank(method='first',ascending=True)
+    )
+    df_first_order = delivery[delivery['rank'] == 1]
+    num_first_order = len(df_first_order)
+    num_immediate_order = (df_first_order['order_date'] == df_first_order['customer_pref_delivery_date']).sum()
+    return pd.DataFrame({"immediate_percentage":[round(num_immediate_order/num_first_order * 100,2)]})
