@@ -147,3 +147,18 @@ def immediate_food_delivery(delivery: pd.DataFrame) -> pd.DataFrame:
     num_first_order = len(df_first_order)
     num_immediate_order = (df_first_order['order_date'] == df_first_order['customer_pref_delivery_date']).sum()
     return pd.DataFrame({"immediate_percentage":[round(num_immediate_order/num_first_order * 100,2)]})
+
+import pandas as pd
+
+def gameplay_analysis(activity: pd.DataFrame) -> pd.DataFrame:
+    activity['login_rank'] = (
+        activity
+        .groupby(['player_id'])['event_date']
+        .rank(method='first',ascending=True)
+    )
+    activity['first_login_date'] = activity.groupby(['player_id'])['event_date'].transform('min')
+    activity['is_second_login'] = np.where(activity['login_rank'] == 2,1,0)
+    df_second_login = activity[activity['login_rank'] == 2]
+    num_player = activity['player_id'].nunique()
+    num_second_login = (df_second_login['event_date'] == df_second_login['first_login_date']+pd.Timedelta(days=1)).sum()
+    return pd.DataFrame({'fraction': [round(num_second_login/num_player,2)]})
