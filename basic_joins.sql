@@ -100,3 +100,35 @@ from (
     from Delivery as d1
 ) as d2
 where d2.rn = 1;
+
+# Write your MySQL query statement below
+select
+    s2.product_id,
+    s2.year as first_year,
+    sum(s2.quantity) as quantity,
+    s2.price
+from (
+    select
+        s.product_id,
+        dense_rank() over (partition by s.product_id order by s.year asc) as rn,
+        s.year,
+        s.quantity,
+        s.price
+    from Sales as s
+) as s2
+where s2.rn = 1;
+group by s2.product_id,s2.year,s2.price;
+
+# row_number, rank, dense_rank
+    
+SELECT 
+    product_id, 
+    year AS first_year, 
+    quantity, 
+    price
+FROM Sales
+WHERE (product_id, year) IN (
+    SELECT product_id, MIN(year)
+    FROM Sales
+    GROUP BY product_id
+);
