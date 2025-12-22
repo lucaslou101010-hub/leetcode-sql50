@@ -132,3 +132,15 @@ WHERE (product_id, year) IN (
     FROM Sales
     GROUP BY product_id
 );
+
+# Write your MySQL query statement below
+select
+    c2.customer_id
+from (
+    select
+        c.customer_id,
+        count(distinct c.product_key) as num_bought_product
+    from Customer as c
+    group by c.customer_id
+) as c2
+where c2.num_bought_product = (select count(*) from Product);
